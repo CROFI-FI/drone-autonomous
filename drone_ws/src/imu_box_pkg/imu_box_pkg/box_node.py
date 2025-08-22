@@ -51,7 +51,7 @@ class ImuNode(Node):
         self.publisher_imu = self.create_publisher(Imu, '/imu/data', 10)
         self.publisher_marker = self.create_publisher(Marker, '/imu_marker', 10)
 
-        self.ser = serial.Serial('/dev/ttyUSB0', 9600)
+        self.ser = serial.Serial('/dev/ttyUSB0', 115200)
         self.timer = self.create_timer(0.05, self.read_serial)
 
         self.accel_scale = 16384.0
