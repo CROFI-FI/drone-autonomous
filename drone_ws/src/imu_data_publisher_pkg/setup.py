@@ -20,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'imu_data_publisher = imu_data_publisher_pkg_py.imu_data_publisher:main'
+            'imu_data_publisher = imu_data_publisher_pkg.imu_data_publisher:main'
         ],
     },
 )
