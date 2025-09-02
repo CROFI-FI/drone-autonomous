@@ -208,4 +208,6 @@ __marimo__/
 
 #Logs de compilación de ROS2
 drone_ws/log/
+drone_ws/build/
+drone_ws/install/
 
