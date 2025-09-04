@@ -33,7 +33,7 @@ def read_imu(bus, addr, reg):
     low = bus.read_byte_data(addr, reg+1)
     value = (high << 8) + low
     if value >= 0x8000:
-        value >= -((65535 - value) + 1)
+        value = -((65535 - value) + 1)
     return value
 
 class mpu_data_node(Node):
