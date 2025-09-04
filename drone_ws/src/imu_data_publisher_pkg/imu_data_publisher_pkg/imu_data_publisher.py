@@ -13,7 +13,7 @@ import math
 
 #I2C directions of the MPU9250
 MPU_ADDR = 0x68
-PWR_MGMT = 0x6B
+PWR_MGMT_1 = 0x6B
 ACCEL_XOUT_H = 0X3B #Aceleración en X
 GYRO_XOUT_H =  0x43 #Velocidad angular en X
 
