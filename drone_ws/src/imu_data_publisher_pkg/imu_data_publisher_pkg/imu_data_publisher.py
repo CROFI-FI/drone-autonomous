@@ -13,7 +13,7 @@ import math
 
 #I2C directions of the MPU9250
 MPU_ADDR = 0x68
-PWR_MGMT = 0x68
+PWR_MGMT = 0x6B
 ACCEL_XOUT_H = 0X3B #Aceleración en X
 GYRO_XOUT_H =  0x43 #Velocidad angular en X
 
@@ -33,7 +33,7 @@ def read_imu(bus, addr, reg):
     low = bus.read_byte_data(addr, reg+1)
     value = (high << 8) + low
     if value >= 0x8000:
-        value >= -((65535 - value) + 1)
+        value = -((65535 - value) + 1)
     return value
 
 class mpu_data_node(Node):
@@ -67,6 +67,7 @@ class mpu_data_node(Node):
             gz = read_imu(self.bus, MPU_ADDR, GYRO_XOUT_H+4)
 
             msg = Float32MultiArray()
+            msg.data = [ax, ay, az, gx, gy, gz]
             #Published in order (ax, ay, az, gx, gy, gz)
             self.publisher_imu.publish(msg)
 
