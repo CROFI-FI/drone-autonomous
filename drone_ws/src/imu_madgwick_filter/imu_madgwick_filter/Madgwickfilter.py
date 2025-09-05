@@ -89,3 +89,6 @@ def main(args=None):
     rclpy.init(args=args)
     node = Imu_Madgwick()
     rclpy.spin(node)
+
+if __name__ == '__main__':
+    main()

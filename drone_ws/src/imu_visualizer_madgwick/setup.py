@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'imu_visualizerMadgwick'
+package_name = 'imu_visualizer_madgwick'
 
 setup(
     name=package_name,
@@ -20,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'visualizerMadgwick = imu_visualizerMadgwick.visualizerMadgwick:main',
+            'visualizerMadgwick = imu_visualizer_madgwick.visualizerMadgwcik:main',
         ],
     },
 )

@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'imu_Madgwickfilter'
+package_name = 'imu_offsets'
 
 setup(
     name=package_name,
@@ -20,7 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'Madgwickfilter = imu_Madgwickfiler.Madgwickfilter:main',
+            'imu_GyroAcc = imu_offsets.imu_GyroAcc:main',
+            'imu_Mag = imu_offsets.imu_Magno:main'
         ],
     },
 )
