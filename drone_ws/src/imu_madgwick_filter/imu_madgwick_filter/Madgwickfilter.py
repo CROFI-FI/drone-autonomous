@@ -9,7 +9,7 @@ import yaml
 class Imu_Madgwick(Node):
     def __init__(self):
         super().__init__('imu_madgwick')
-        self.subscription = self.create_subscription(Float32MultiArray, '/imu/raw_data', 10)
+        self.subscription = self.create_subscription(Float32MultiArray, '/imu/raw_data',self.read_data ,10)
         
         with open("imu_calibration.yaml","r") as f:
             calib = yaml.safe_load(f)
