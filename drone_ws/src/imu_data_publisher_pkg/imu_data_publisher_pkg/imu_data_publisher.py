@@ -67,7 +67,7 @@ class mpu_data_node(Node):
             gz = read_imu(self.bus, MPU_ADDR, GYRO_XOUT_H+4)
 
             msg = Float32MultiArray()
-            msg.data = [ax, ay, az, gx, gy, gz]
+            msg.data = [float(ax), float(ay), float(az), float(gx), float(gy), float(gz)]
             #Published in order (ax, ay, az, gx, gy, gz)
             self.publisher_imu.publish(msg)
 
