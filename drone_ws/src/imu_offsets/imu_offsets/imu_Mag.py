@@ -9,7 +9,7 @@ import numpy as np
 class Imu_CalibrationMagno(Node):
     def __init__(self):
         super().__init__('imu_magno_offsets')
-        self.subscription = self.create_subscription(Float32MultiArray, '/imu/raw_data', 10)
+        self.subscription = self.create_subscription(Float32MultiArray, '/imu/raw_data',self.read_data ,10)
         self.timer = self.create_timer(0.05, self.read_data)
 
         self.mag_data = []
