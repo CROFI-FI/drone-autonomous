@@ -9,7 +9,7 @@ import yaml
 class Imu_Madgwick(Node):
     def __init__(self):
         super().__init__('imu_madgwick')
-        self.subscription = self.create_subscription(Float32MultiArray, '/imu/raw_data',self.read_data ,10)
+        self.subscription = self.create_subscription(Float32MultiArray, '/imu/raw_data', self.read_data ,10)
         
         with open("imu_calibration.yaml","r") as f:
             calib = yaml.safe_load(f)
@@ -47,7 +47,7 @@ class Imu_Madgwick(Node):
 
         self.pub_quat = self.create_publisher(Quaternion, '/imu/orientation', 10)
         
-        self.timer = self.create_timer(0.05, self.read_data)
+        #self.timer = self.create_timer(0.05, self.read_data)
 
     
     def read_data(self, msg):
@@ -69,7 +69,7 @@ class Imu_Madgwick(Node):
         MZ = (data[8] / self.mag_scale ) - self.data_offcal[8]
 
         acc = np.array([AX, AY, AZ])
-        acc_norm = np.lianlg.norm(acc)
+        acc_norm = np.linalg.norm(acc)
         if acc_norm > 0:
             acc /= acc_norm
         gyr = np.array([GX, GY, GZ])

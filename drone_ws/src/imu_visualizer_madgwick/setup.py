@@ -20,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'visualizerMadgwick = imu_visualizer_madgwick.visualizerMadgwcik:main',
+            'vizualizerMadgwick = imu_visualizer_madgwick.vizualizerMadgwick:main',
         ],
     },
 )

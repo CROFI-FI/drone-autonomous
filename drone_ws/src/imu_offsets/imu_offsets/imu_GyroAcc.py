@@ -11,9 +11,9 @@ class Imu_CalibrationGyroAcce(Node):
         super().__init__('imu_gyroacc_offsets')
         self.subscription = self.create_subscription(Float32MultiArray, '/imu/raw_data', self.read_data, 10)
     
-        self.timer = self.create_timer(0.05, self.read_data)
+        #self.timer = self.create_timer(0.05, self.read_data)
 
-        self.data_buffer = np.zeros((200, 9))
+        self.data_buffer = np.zeros((200, 6))
         self.count = 0
         self.calibrated = False
         self.i = 0
@@ -43,7 +43,7 @@ class Imu_CalibrationGyroAcce(Node):
             self.calibration_callback()
             self.calibrated = True
             self.get_logger().info("Calibración, finalizada, guardando YAML")
-            self.save_offsets() 
+            #self.save_offsets() 
 
     def calibration_callback(self):
         means = np.mean(self.data_buffer, axis=0)
@@ -51,14 +51,14 @@ class Imu_CalibrationGyroAcce(Node):
 
         offsets = {
             "accelerometer": {
-                "ax_offset": self.ax_offset,
-                "ay_offset": self.ay_offset,
-                "az_offset": self.az_offset,
+                "ax_offset": float(self.ax_offset),
+                "ay_offset": float(self.ay_offset),
+                "az_offset": float(self.az_offset),
             },
             "gyroscope": {
-                "gx_offset": self.gx_offset,
-                "gy_offset": self.gy_offset,
-                "gz_offset": self.gz_offset,
+                "gx_offset": float(self.gx_offset),
+                "gy_offset": float(self.gy_offset),
+                "gz_offset": float(self.gz_offset),
             },
             "magnetometer": {
                 "mx_offset": 0,

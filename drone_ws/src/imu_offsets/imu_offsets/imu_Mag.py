@@ -9,8 +9,9 @@ import numpy as np
 class Imu_CalibrationMagno(Node):
     def __init__(self):
         super().__init__('imu_magno_offsets')
-        self.subscription = self.create_subscription(Float32MultiArray, '/imu/raw_data',self.read_data ,10)
-        self.timer = self.create_timer(0.05, self.read_data)
+        self.subscription = self.create_subscription(Float32MultiArray, '/imu/raw_data', self.read_data ,10)
+        
+        #self.timer = self.create_timer(0.05, self.read_data)
 
         self.mag_data = []
         self.start_time = time.time()
@@ -61,9 +62,9 @@ class Imu_CalibrationMagno(Node):
             calibration_data = {}
         
         calibration_data["magnetometer"] = {
-                "mx_offset": self.mx_offset,
-                "my_offset": self.my_offset,
-                "mz_offset": self.mz_offset,
+                "mx_offset": float(self.mx_offset),
+                "my_offset": float(self.my_offset),
+                "mz_offset": float(self.mz_offset),
             }
             
         with open(yaml_file,"w") as f:

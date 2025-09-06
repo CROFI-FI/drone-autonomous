@@ -21,7 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
             'imu_GyroAcc = imu_offsets.imu_GyroAcc:main',
-            'imu_Mag = imu_offsets.imu_Magno:main'
+            'imu_Mag = imu_offsets.imu_Mag:main'
         ],
     },
 )

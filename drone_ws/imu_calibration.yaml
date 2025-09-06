@@ -1,0 +1,12 @@
+accelerometer:
+  ax_offset: 1275.28
+  ay_offset: 1042.26
+  az_offset: 12763.74
+gyroscope:
+  gx_offset: 271.83
+  gy_offset: -383.67
+  gz_offset: -83.985
+magnetometer:
+  mx_offset: 150.31640625
+  my_offset: 210.283203125
+  mz_offset: 9.1875
