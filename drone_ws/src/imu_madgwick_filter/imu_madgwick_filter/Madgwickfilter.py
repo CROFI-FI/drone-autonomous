@@ -76,10 +76,10 @@ class Imu_Madgwick(Node):
         self.Q = self.madgwick.updateMARG(self.Q, gyr=gyr, acc=acc, mag=mag)
         
         quat_msg = Quaternion()
-        quat_msg.w = float(self.Q[0])
-        quat_msg.x = float(self.Q[1])
-        quat_msg.y = float(self.Q[2])
-        quat_msg.z = float(self.Q[3])
+        quat_msg.w = round(float(self.Q[0]),4)
+        quat_msg.x = round(float(self.Q[1]),4)
+        quat_msg.y = round(float(self.Q[2]),4)
+        quat_msg.z = round(float(self.Q[3]),4)
 
         self.pub_quat.publish(quat_msg)
 

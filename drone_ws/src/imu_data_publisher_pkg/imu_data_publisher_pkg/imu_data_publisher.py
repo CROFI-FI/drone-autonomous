@@ -103,9 +103,9 @@ class mpu_data_node(Node):
 
             # --- Publica ---
             msg = Float32MultiArray()
-            msg.data = [float(ax), float(ay), float(az),
-                        float(gx), float(gy), float(gz),
-                        float(mx), float(my), float(mz)]
+            msg.data = [round(float(ax),4), round(float(ay),4), round(float(az),4),
+                        round(float(gx),4), round(float(gy),4), round(float(gz),4),
+                        round(float(mx),4), round(float(my),4), round(float(mz),4)]
             self.publisher_imu.publish(msg)
 
         except Exception as e:

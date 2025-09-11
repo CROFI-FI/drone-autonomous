@@ -7,8 +7,6 @@ class Imu_NodeVisualizer(Node):
     def __init__(self):
         super().__init__('imu_visualizer')
         self.subscription = self.create_subscription(Quaternion, '/imu/orientation',self.orientation_callback ,10)
-
-        #self.timer = self.create_timer(0.05, self.update)
         self.publisher = self.create_publisher(Marker, '/imu/cube_marker', 10)
         self.marker_id = 0
         

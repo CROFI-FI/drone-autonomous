@@ -51,14 +51,14 @@ class Imu_CalibrationGyroAcce(Node):
 
         offsets = {
             "accelerometer": {
-                "ax_offset": float(self.ax_offset),
-                "ay_offset": float(self.ay_offset),
-                "az_offset": float(self.az_offset),
+                "ax_offset": round(float(self.ax_offset), 4),
+                "ay_offset": round(float(self.ay_offset), 4),
+                "az_offset": round(float(self.az_offset), 4),
             },
             "gyroscope": {
-                "gx_offset": float(self.gx_offset),
-                "gy_offset": float(self.gy_offset),
-                "gz_offset": float(self.gz_offset),
+                "gx_offset": round(float(self.gx_offset), 4),
+                "gy_offset": round(float(self.gy_offset), 4),
+                "gz_offset": round(float(self.gz_offset), 4),
             },
             "magnetometer": {
                 "mx_offset": 0,

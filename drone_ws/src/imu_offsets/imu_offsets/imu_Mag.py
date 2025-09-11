@@ -62,9 +62,9 @@ class Imu_CalibrationMagno(Node):
             calibration_data = {}
         
         calibration_data["magnetometer"] = {
-                "mx_offset": float(self.mx_offset),
-                "my_offset": float(self.my_offset),
-                "mz_offset": float(self.mz_offset),
+                "mx_offset": round(float(self.mx_offset), 4),
+                "my_offset": round(float(self.my_offset), 4),
+                "mz_offset": round(float(self.mz_offset), 4),
             }
             
         with open(yaml_file,"w") as f:
