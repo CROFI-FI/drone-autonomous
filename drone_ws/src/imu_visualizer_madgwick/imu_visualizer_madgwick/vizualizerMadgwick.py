@@ -6,23 +6,24 @@ from visualization_msgs.msg import Marker
 class Imu_NodeVisualizer(Node):
     def __init__(self):
         super().__init__('imu_visualizer')
-        self.subscription = self.create_subscription(Quaternion, '/imu/orientation',self.update ,10)
+        self.subscription = self.create_subscription(Quaternion, '/imu/orientation',self.orientation_callback ,10)
 
         #self.timer = self.create_timer(0.05, self.update)
         self.publisher = self.create_publisher(Marker, '/imu/cube_marker', 10)
-
-
-    def update(self, msg):
+        self.marker_id = 0
+        
+    def orientation_callback(self, msg: Quaternion):
         marker = Marker()
-        marker.header.frame_id = "map"
+        marker.header.frame_id = "imu_link"
         marker.header.stamp = self.get_clock().now().to_msg()
-        marker.id = 0
+        marker.ns = "imu_visualization"
+        marker.id = self.marker_id
         marker.type = Marker.CUBE
         marker.action = Marker.ADD
 
-        marker.scale.x = 0.2
-        marker.scale.y = 0.2
-        marker.scale.z = 0.2
+        marker.scale.x = 0.5
+        marker.scale.y = 0.3
+        marker.scale.z = 0.15
 
         marker.color.a = 1.0
         marker.color.r = 0.0

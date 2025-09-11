@@ -47,8 +47,6 @@ class Imu_Madgwick(Node):
 
         self.pub_quat = self.create_publisher(Quaternion, '/imu/orientation', 10)
         
-        #self.timer = self.create_timer(0.05, self.read_data)
-
     
     def read_data(self, msg):
         
