@@ -9,64 +9,74 @@ from std_msgs.msg import Int32MultiArray
 MOTOR_PINS = [17, 23, 27, 22]  # cámbialos según tu conexión
 pi = pigpio.pi()
 
+
 class MotorControlNode(Node):
     def __init__(self):
         super().__init__('motor_control_node')
+        self.get_logger().info("Iniciando nodo de control de motores...")
+        self.last_msg_time = self.get_clock().now()  # Guarda el último tiempo de mensaje recibido
+        self.setup_hardware()
+
+        # Suscriptor
         self.subscription = self.create_subscription(
             Int32MultiArray,
-            'motor_speeds',   # nombre del tópico
+            'motor_speeds',
             self.listener_callback,
-            10)
-        self.get_logger().info("Nodo de control de motores iniciado")
+            1
+        )
 
+        # Timer para failsafe (revisa cada 0.1s)
+        self.timer = self.create_timer(0.1, self.failsafe_check)
+
+        self.get_logger().info("Nodo listo, esperando comandos en /motor_speeds")
+
+    def setup_hardware(self):
         # Inicializa pines
         for pin in MOTOR_PINS:
             pi.set_mode(pin, pigpio.OUTPUT)
             pi.set_servo_pulsewidth(pin, 0)
 
-        # Ejecutar secuencia de armado automáticamente
-        self.arm_motors()
+        self.get_logger().info("Pines inicializados")
 
-    def arm_motors(self):
-        self.get_logger().info("Armando motores: enviando 2000 → 1000 µs")
-        # Paso 1: enviar máximo
+        # Armado de ESC
+        self.get_logger().info("Armando motores (2000 → 1000 µs)...")
         for pin in MOTOR_PINS:
             pi.set_servo_pulsewidth(pin, 2000)
-        time.sleep(2)  # espera 2 segundos
+        time.sleep(2)
 
-        # Paso 2: enviar mínimo
         for pin in MOTOR_PINS:
             pi.set_servo_pulsewidth(pin, 1000)
-        time.sleep(2)  # espera 2 segundos
+        time.sleep(2)
 
-        # Ahora los ESC deberían estar armados
-        self.get_logger().info("Motores armados, listos para recibir comandos")
+        self.get_logger().info("Motores armados y listos (esperando comandos)")
 
-        # Dejar en mínimo hasta que llegue el primer comando
-        for pin in MOTOR_PINS:
-            pi.set_servo_pulsewidth(pin, 1000)
+    def listener_callback(self, msg: Int32MultiArray):
+        self.last_msg_time = self.get_clock().now()  # Actualiza tiempo del último mensaje
+        motor_speeds = list(msg.data[:len(MOTOR_PINS)])
+        motor_speeds += [1000] * (len(MOTOR_PINS) - len(motor_speeds))
+        motor_speeds = [max(1000, min(2000, s)) for s in motor_speeds]
 
-    def listener_callback(self, msg):
-        motor_speeds = msg.data
-        for i, speed in enumerate(motor_speeds):
-            if i < len(MOTOR_PINS):
-                # Limita rango típico ESC 1000–2000 µs
-                speed = max(1000, min(2000, speed))
-                pi.set_servo_pulsewidth(MOTOR_PINS[i], speed)
+        for pin, speed in zip(MOTOR_PINS, motor_speeds):
+            pi.set_servo_pulsewidth(pin, speed)
+
+    def failsafe_check(self):
+        now = self.get_clock().now()
+        elapsed = (now - self.last_msg_time).nanoseconds / 1e9  # en segundos
+        if elapsed > 1.0:  # más de 1s sin datos
+            for pin in MOTOR_PINS:
+                pi.set_servo_pulsewidth(pin, 1000)
+            self.get_logger().warn("Failsafe activado: motores al mínimo (1000 µs)")
+
 
 def main(args=None):
     rclpy.init(args=args)
     node = MotorControlNode()
-    try:
-        rclpy.spin(node)
-    except KeyboardInterrupt:
-        pass
-    finally:
-        for pin in MOTOR_PINS:
-            pi.set_servo_pulsewidth(pin, 0)
-        pi.stop()
-        node.destroy_node()
-        rclpy.shutdown()
+    rclpy.spin(node)
 
-if __name__ == '__main__':
+    node.destroy_node()
+    rclpy.shutdown()
+
+
+if __name__ == "__main__":
     main()
+

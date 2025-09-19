@@ -20,7 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-        'node_motors = pwm_pkg_py.node_motors:main'
+        'node_motors = pwm_pkg_py.node_motors:main',
+        'sin_test = pwm_pkg_py.sin_test:main'
         ],
     },
 )
