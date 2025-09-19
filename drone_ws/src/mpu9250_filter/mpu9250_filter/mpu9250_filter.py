@@ -6,6 +6,7 @@ from geometry_msgs.msg import Quaternion, Vector3 # type: ignore
 from smbus2 import SMBus # type: ignore
 import math 
 import yaml # type: ignore
+import struct 
 
 MPU_ADDR = 0x68
 PWR_MGMT_1 = 0x6B
@@ -19,10 +20,17 @@ GYRO_SCALE_FACTOR = 131.0 #LSB deg/s para un rango de +-250 deg/s
 def read_imu(bus,addr,reg):
     high = bus.read_byte_data(addr,reg)
     low = bus.read_byte_data(addr,reg +1)
+    """
     value = (high << 8) + low
     if value >= 0x8000:
         value = -((65535 - value)+ 1)
     return value
+    """
+    byte_data = bytes([high, low])
+    #Se define que se trabaja con big-endian y entero de 16 bits con signo
+    value, = struct.unpack('>h', byte_data)
+
+    return value 
 
 class MPU_data_node(Node):
     def __init__(self):

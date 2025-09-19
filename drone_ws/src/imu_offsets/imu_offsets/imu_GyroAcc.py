@@ -1,5 +1,6 @@
 import time
 import yaml
+import struct
 from smbus2 import SMBus
 
 
@@ -21,14 +22,14 @@ GYRO_SCALE_FACTOR = 131.0     # LSB/(°/s) for ±250°/s range
 GRAVITY_G = 9.80665
 PI = 3.14159265359
 
-def read_word(bus, reg):
+def read_world(bus, reg):
     high = bus.read_byte_data(MPU_ADDR, reg)
     low = bus.read_byte_data(MPU_ADDR, reg + 1)
-    value = (high << 8) + low
-    if value >= 0x8000:
-        return -((65535 - value) + 1)
-    else:
-        return value
+    byte_data = bytes([high, low])
+    #Se define que se trabaja con big-endian y entero de 16 bits con signo
+    value, = struct.unpack('>h', byte_data)
+
+    return value
 
 def main():
     bus = None  
@@ -54,13 +55,13 @@ def main():
         samples = 500
 
         for _ in range(samples):
-            accel_raw_offsets[0] += read_word(bus, ACCEL_XOUT_H)
-            accel_raw_offsets[1] += read_word(bus, ACCEL_XOUT_H + 2)
-            accel_raw_offsets[2] += read_word(bus, ACCEL_XOUT_H + 4)
+            accel_raw_offsets[0] += read_world(bus, ACCEL_XOUT_H)
+            accel_raw_offsets[1] += read_world(bus, ACCEL_XOUT_H + 2)
+            accel_raw_offsets[2] += read_world(bus, ACCEL_XOUT_H + 4)
             
-            gyro_raw_offsets[0] += read_word(bus, GYRO_XOUT_H)
-            gyro_raw_offsets[1] += read_word(bus, GYRO_XOUT_H + 2)
-            gyro_raw_offsets[2] += read_word(bus, GYRO_XOUT_H + 4)
+            gyro_raw_offsets[0] += read_world(bus, GYRO_XOUT_H)
+            gyro_raw_offsets[1] += read_world(bus, GYRO_XOUT_H + 2)
+            gyro_raw_offsets[2] += read_world(bus, GYRO_XOUT_H + 4)
             
             time.sleep(0.004)
 
