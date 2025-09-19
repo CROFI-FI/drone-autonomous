@@ -5,6 +5,7 @@ from std_msgs.msg import Header # type: ignore
 from geometry_msgs.msg import Quaternion, Vector3 # type: ignore
 from smbus2 import SMBus # type: ignore
 import math 
+import yaml # type: ignore
 
 MPU_ADDR = 0x68
 PWR_MGMT_1 = 0x6B
@@ -27,7 +28,12 @@ class MPU_data_node(Node):
     def __init__(self):
         super().__init__('mpu9250_publisher_node')
 
-        self.publisher_imu = self.create_publisher(Imu, '/imu/data', 10)
+        with open("imu_calibration.yaml","r") as f:
+            calib = yaml.safe_load(f)
+        self.ACCEL_OFFSETS = calib["accel_offsets"]
+        self.GYRO_OFFSETS = calib["gyro_offsets"]
+
+        self.publisher_imu = self.create_publisher(Imu, '/imu/raw_data', 10)
         self.bus = SMBus(1)
         self.bus.write_byte_data(MPU_ADDR, PWR_MGMT_1, 0)
 
@@ -60,20 +66,20 @@ class MPU_data_node(Node):
         gz = (gz_raw / GYRO_SCALE_FACTOR) * (math.pi / 180)
 
         imu_msg.linear_acceleration = Vector3()
-        imu_msg.linear_acceleration = ax
-        imu_msg.linear_acceleration = ay
-        imu_msg.linear_acceleration = az
+        imu_msg.linear_acceleration.x = ax - self.ACCEL_OFFSETS[0]
+        imu_msg.linear_acceleration.y = ay - self.ACCEL_OFFSETS[1]
+        imu_msg.linear_acceleration.z = az - self.ACCEL_OFFSETS[2]
 
         imu_msg.angular_velocity = Vector3()
-        imu_msg.angular_velocity = gx
-        imu_msg.angular_velocity = gy
-        imu_msg.angular_velocity = gz
+        imu_msg.angular_velocity.x = gx - self.GYRO_OFFSETS[0]
+        imu_msg.angular_velocity.y = gy - self.GYRO_OFFSETS[1]
+        imu_msg.angular_velocity.z = gz - self.GYRO_OFFSETS[2]
 
         imu_msg.orientation = Quaternion()
         imu_msg.orientation.x = 0.0
         imu_msg.orientation.y = 0.0
         imu_msg.orientation.z = 0.0
-        imu_msg.orientation.w = 1,0
+        imu_msg.orientation.w = 1.0
 
         #Establecer la covarianza 
         imu_msg.orientation_covariance = [-1.0] * 9
@@ -91,10 +97,3 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
-
-
-
-        
-        
-        
-
