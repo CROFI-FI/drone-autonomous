@@ -5,6 +5,8 @@ from std_msgs.msg import Header # type: ignore
 from geometry_msgs.msg import Quaternion, Vector3 # type: ignore
 from smbus2 import SMBus # type: ignore
 import math 
+import struct
+import float64
 
 MPU_ADDR = 0x68
 PWR_MGMT_1 = 0x6B
@@ -18,9 +20,9 @@ GYRO_SCALE_FACTOR = 131.0 #LSB deg/s para un rango de +-250 deg/s
 def read_imu(bus,addr,reg):
     high = bus.read_byte_data(addr,reg)
     low = bus.read_byte_data(addr,reg +1)
-    value = (high << 8) + low
-    if value >= 0x8000:
-        value = -((65535 - value)+ 1)
+    byte_data = bytes([high, low])
+    #Se define que se trabaja con big-endian y entero de 16 bits con signo
+    value, = struct.unpack('>h', byte_data)
     return value
 
 class MPU_data_node(Node):
@@ -60,20 +62,20 @@ class MPU_data_node(Node):
         gz = (gz_raw / GYRO_SCALE_FACTOR) * (math.pi / 180)
 
         imu_msg.linear_acceleration = Vector3()
-        imu_msg.linear_acceleration = ax
-        imu_msg.linear_acceleration = ay
-        imu_msg.linear_acceleration = az
+        imu_msg.linear_acceleration.x = float64(ax)
+        imu_msg.linear_acceleration.y = float64(ay)
+        imu_msg.linear_acceleration.z = float64(az)
 
         imu_msg.angular_velocity = Vector3()
-        imu_msg.angular_velocity = gx
-        imu_msg.angular_velocity = gy
-        imu_msg.angular_velocity = gz
+        imu_msg.angular_velocity.x = float64(gx)
+        imu_msg.angular_velocity.y = float64(gy)
+        imu_msg.angular_velocity.z = float64(gz)
 
         imu_msg.orientation = Quaternion()
         imu_msg.orientation.x = 0.0
         imu_msg.orientation.y = 0.0
         imu_msg.orientation.z = 0.0
-        imu_msg.orientation.w = 1,0
+        imu_msg.orientation.w = 1.0
 
         #Establecer la covarianza 
         imu_msg.orientation_covariance = [-1.0] * 9
