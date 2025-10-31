@@ -211,3 +211,8 @@ drone_ws/log/
 drone_ws/build/
 drone_ws/install/
 
+#PX4 compilación
+px4_ros_com_ws/build/
+px4_ros_com_ws/log/
+px4_ros_com_ws/install/
+px4_ros_com_ws/src/
