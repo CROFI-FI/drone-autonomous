@@ -91,7 +91,8 @@ def generate_launch_description():
     #Iniciar los modelos del mundo
     set_models = AppendEnvironmentVariable(
         name='GZ_SIM_RESOURCE_PATH',
-        value=px4_models_path,
+        value=f"{px4_models_path}/models:{px4_models_path}/worlds",
+        # value=px4_models_path,
         separator=':'
     )
 
