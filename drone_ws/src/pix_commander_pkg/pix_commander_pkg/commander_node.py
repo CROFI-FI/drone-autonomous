@@ -2,7 +2,9 @@ import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
 from px4_msgs.msg import OffboardControlMode, TrajectorySetpoint, VehicleCommand, VehicleStatus
-from geometry_msgs.msg import Point #Mensajes internos
+#Point para NED [X Y Z] -> se cambia por Twist NED [X y Z A]
+from geometry_msgs.msg import Twist
+import math
 
 class CommanderNode(Node):
     def __init__(self):
@@ -37,17 +39,18 @@ class CommanderNode(Node):
         
         # Suscriptor para recibir órdenes del nodo manual.py  
         self.cmd_subscriber = self.create_subscription(
-            Point, '/drone/cmd_pose', self.cmd_pose_callback, qos_profile_internal)
+            Twist, '/drone/cmd_pose', self.cmd_pose_callback, qos_profile_internal) #Se cambia por Twist
 
         # Variables de estado
         self.vehicle_status = VehicleStatus()
         self.nav_state = VehicleStatus.NAVIGATION_STATE_MAX
         self.counter = 0
         
-        # Posición Objetivo Inicial NED: x=0, y=0, z=-2.0  (2 metros de altura)
+        # Posición Objetivo Inicial NED: x=0, y=0, z=-2.0  (2 metros de altura) yaw = 0.0 
         self.target_x = 0.0
         self.target_y = 0.0
         self.target_z = -2.0 
+        self.target_yaw = 0.0
 
         # Timer a 10Hz
         self.timer = self.create_timer(0.1, self.timer_callback)
@@ -59,11 +62,15 @@ class CommanderNode(Node):
 
     # Callback cuando ejecutas el comando
     def cmd_pose_callback(self, msg):
-        self.get_logger().info(f"¡Nueva orden recibida! Moviendo a X:{msg.x} Y:{msg.y} Altura:{msg.z}")
-        self.target_x = msg.x
-        self.target_y = msg.y
+        self.target_x = msg.linear.x
+        self.target_y = msg.linear.y
         # Se convierte altura positiva a NED negativo sistema PX4
-        self.target_z = -1.0 * abs(msg.z) 
+        self.target_z = -1.0 * abs(msg.linear.z)
+        # Se convierte grados a radianes si envías grados desde manual
+        yaw_deg = msg.angular.z
+        self.target_yaw = yaw_deg * (math.pi / 180.0)
+        self.get_logger().info(f"Moviendo a X:{self.target_x: .2f} Y:{self.target_y: .2f} Z:{self.target_z: .2f} A:{self.target_yaw: .2f}")
+
 
     # Sacado de la documentación de la PX4
     def publish_vehicle_command(self, command, param1=0.0, param2=0.0):
@@ -109,7 +116,7 @@ class CommanderNode(Node):
         traj_msg = TrajectorySetpoint()
         traj_msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
         traj_msg.position = [self.target_x, self.target_y, self.target_z]
-        traj_msg.yaw = 0.0
+        traj_msg.yaw = self.target_yaw
 
         self.trajectory_setpoint_publisher.publish(traj_msg)
         self.counter += 1

@@ -25,7 +25,7 @@ def generate_launch_description():
     px4_autopilot_dir = os.path.join(repo_root, 'PX4-Autopilot')
     px4_ros_com_ws_path = os.path.join(repo_root, 'px4_ros_com_ws')
     px4_ros_com_setup_path = os.path.join(px4_ros_com_ws_path, 'install', 'setup.bash')
-
+    drone_ws_setup_path = os.path.join(ws_root, 'install', 'setup.bash') #commander node
     px4_models_path = os.path.expanduser('~/drone-autonomous/PX4-Autopilot/Tools/simulation/gz/models')
 
     #Argumento de Lanzamiento solo para QGroundControl
@@ -81,7 +81,8 @@ def generate_launch_description():
                 cmd=['bash', '-c',
                      f'source {ros_setup_path} &&'
                      f'source {px4_ros_com_setup_path} &&'
-                     f'ros2 run px4_ros_com offboard_control' 
+                     f'source {drone_ws_setup_path} &&'
+                     f'ros2 run pix_commander_pkg commander' 
                      ], #Depende del nodo se puede cambiar el nodo iniciado
                 output='screen', 
             )
